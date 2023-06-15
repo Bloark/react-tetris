@@ -10,4 +10,4 @@
 8. Detecção de colição
 9. Rotação da peças do tetris
 10. Limpando linha.
-11. 
+11. CRiado GameStatus para jogos
