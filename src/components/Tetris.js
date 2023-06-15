@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
 import { createStage, checkCollision } from '../gameHelpers';
-
-// Styled Components
 import { StyledTetrisWrapper, StyledTetris } from './styles/StyledTetris';
 
 // Custom Hooks
@@ -34,29 +32,38 @@ const Tetris = () => {
     }
   };
 
+  const keyUp = ({ keyCode }) => {
+    if (!gameOver) {
+      // Activate the interval again when user releases down arrow.
+      if (keyCode === 40) {
+        setDropTime(1000 / (level + 1));
+      }
+    }
+  };
+
   const startGame = () => {
     // Reset everything
     setStage(createStage());
     setDropTime(1000);
     resetPlayer();
-    setGameOver(false);
     setScore(0);
-    setRows(0);
     setLevel(0);
+    setRows(0);
+    setGameOver(false);
   };
 
   const drop = () => {
-    //increase level when player has cleared 10 rows
+    // Increase level when player has cleared 10 rows
     if (rows > (level + 1) * 10) {
-      setLevel(prev => prev + 1)
+      setLevel(prev => prev + 1);
       // Also increase speed
       setDropTime(1000 / (level + 1) + 200);
     }
-      
+
     if (!checkCollision(player, stage, { x: 0, y: 1 })) {
       updatePlayerPos({ x: 0, y: 1, collided: false });
     } else {
-      // Game Over
+      // Game over!
       if (player.pos.y < 1) {
         console.log('GAME OVER!!!');
         setGameOver(true);
@@ -66,20 +73,18 @@ const Tetris = () => {
     }
   };
 
-  const keyUp = ({ keyCode }) => {
-    if (!gameOver) {
-      if (keyCode === 40) {
-        console.log("interval on")
-        setDropTime(1000 / (level + 1) + 200);
-      }
-    }
-  };
-
   const dropPlayer = () => {
-    console.log("interval off")
+    // We don't need to run the interval when we use the arrow down to
+    // move the tetromino downwards. So deactivate it for now.
     setDropTime(null);
     drop();
   };
+
+  // This one starts the game
+  // Custom hook by Dan Abramov
+  useInterval(() => {
+    drop();
+  }, dropTime);
 
   const move = ({ keyCode }) => {
     if (!gameOver) {
@@ -94,10 +99,6 @@ const Tetris = () => {
       }
     }
   };
-
-  useInterval(() => {
-    drop();
-  }, dropTime);
 
   return (
     <StyledTetrisWrapper
@@ -114,8 +115,8 @@ const Tetris = () => {
           ) : (
             <div>
               <Display text={`Score: ${score}`} />
-              <Display text={`Rows: ${rows}`} />
-              <Display text={`Level: ${level}`}  />
+              <Display text={`rows: ${rows}`} />
+              <Display text={`Level: ${level}`} />
             </div>
           )}
           <StartButton callback={startGame} />
